@@ -26,6 +26,7 @@ pub struct Options {
     keywords: Vec<Keyword>,
     filler_words: bool,
     smart_format: bool,
+    paragraphs: Option<bool>,
     keyword_boost_legacy: bool,
     utterances: Option<Utterances>,
     tags: Vec<String>,
@@ -284,6 +285,7 @@ impl OptionsBuilder {
             keywords: Vec::new(),
             filler_words: false,
             smart_format: false,
+            paragraphs: None,
             keyword_boost_legacy: false,
             utterances: None,
             tags: Vec::new(),
@@ -1078,7 +1080,7 @@ impl OptionsBuilder {
 
         self
     }
-    
+
     #[allow(missing_docs)]
     pub fn smart_format(mut self, smart_format: bool) -> Self {
         self.0.smart_format = smart_format;
@@ -1089,6 +1091,13 @@ impl OptionsBuilder {
     #[allow(missing_docs)]
     pub fn filler_words(mut self, filler_words: bool) -> Self {
         self.0.filler_words = filler_words;
+
+        self
+    }
+
+    #[allow(missing_docs)]
+    pub fn paragraphs(mut self, paragraphs: bool) -> Self {
+        self.0.paragraphs = Some(paragraphs);
 
         self
     }
@@ -1130,6 +1139,7 @@ impl Serialize for SerializableOptions<'_> {
             keywords,
             filler_words,
             smart_format,
+            paragraphs,
             keyword_boost_legacy,
             utterances,
             tags,
@@ -1233,6 +1243,10 @@ impl Serialize for SerializableOptions<'_> {
 
         seq.serialize_element(&("filler_words", filler_words))?;
         seq.serialize_element(&("smart_format", smart_format))?;
+
+        if let Some(paragraphs) = paragraphs {
+            seq.serialize_element(&("paragraphs", paragraphs))?;
+        }
 
         match utterances {
             Some(Utterances::Disabled) => seq.serialize_element(&("utterances", false))?,
